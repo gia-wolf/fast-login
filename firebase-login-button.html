@@ -1,0 +1,113 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="bower_components/iron-icons/social-icons.html"
+<link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="firebase-login.html">
+<!--
+firebase-login-button is a special-function-button. When the user touches the button, a form is opened requiring input of email and password. These data are verified in a firebase location (to be specified as parameter {{authurl}}). After successfull login an "appuser" is returned as parameter .
+
+Example:
+
+    <firebase-login-button 
+      authurl="[[firebase-url]]" 
+      user="{{app-user}}"
+      icon="[[icon]]"
+    >
+    </firebase-login-button>
+
+### Styling
+
+The following custom properties are available for styling and layout:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`button-icon` | Button icon | `social:person`
+
+@group Seed Elements
+@element firebase-login
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id='firebase-login-button'>
+	<!--  -->
+	<style>
+
+	    :host {
+	    	/*background-color: yellow; 	*/
+	    }	
+
+		paper-icon-button {	/*same styles as login-form*/
+	      color: var(--login-button-color, blue);
+	      background-color: var(--login-button-background-color, orange);
+		}
+
+	</style>
+
+	<template>
+		<!-- <paper-menu-button vertical-align="top" horizontal-align="left"> -->
+		<paper-menu-button>
+			<paper-icon-button 
+				class="dropdown-trigger" 
+				icon="[[icon]]">
+			</paper-icon-button>
+			<firebase-login 
+				class  ="dropdown-content" 
+				user   ="{{user}}" 
+				authurl="[[authurl]]" 
+				authaction="[[authaction]]">
+			</firebase-login>
+		</paper-menu-button>
+	</template>
+
+	<script>
+		Polymer({
+			is: 'firebase-login-button',
+
+			properties:{
+				/**
+				* Sets the url of the firebase-app managing the users having access to the actual app.
+				*/
+				authurl: {
+					type: String,
+					value: "https://mapslide.firebaseio.com"
+				},
+
+				/**
+				* Result of Authentification: user.
+				*/
+				user: {
+					type: Object,
+					value: null,
+					notify: true
+				},
+
+				/**
+				* Optional: Polymer-Icon-key.
+				*/
+				icon: {
+					type: String,
+					value: "social:person"
+				},
+
+				/**
+				* Optional: Specific action to run after successfull authentification.
+				*/
+				authaction: {
+					type: Function,
+					value: null
+				}
+			}
+		});     
+	</script>
+</dom-module> 
+

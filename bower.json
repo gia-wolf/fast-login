@@ -1,0 +1,35 @@
+{
+  "name": "firebase-login",
+  "version": "1.0.3",
+  "authors": [
+    "Anonymous <anonymous@example.com>"
+  ],
+  "description": "An element to enable LOGIN based on firebase.",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "seed",
+    "firebase",
+    "mail"
+  ],
+  "main": "firebase-login.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/gia-wolf/firebase-login/",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.0",
+    "firebase": "~2.3.1",
+    "firebase-element": "GoogleWebComponents/firebase-element#~1.0.7",
+    "paper-menu-button": "PolymerElements/paper-menu-button#~1.0.3",
+    "paper-icon-button": "PolymerElements/paper-icon-button#~1.0.5",
+    "paper-input": "PolymerElements/paper-input#~1.0.18",
+    "polymer-themes": "~1.0.1"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}
