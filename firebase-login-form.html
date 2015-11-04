@@ -1,0 +1,252 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/firebase-element/firebase-auth.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+
+<!--
+An element showing a Form  with inputs for Email and Pwd. On submit the input data are checked by a firebase-server returning a valid "user" on success.
+
+Example:
+
+    <firebase-login authurl="[[firebase-url]]" user="{{user}}"></firebase-login>
+
+### Styling
+
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--form-background-color` | Form background | `orange`
+`--form-width` | Form width | `300px`
+`--button-background-color` | Button background | `white`
+
+### Drawbacks
+any known.
+
+@group Seed Elements
+@element firebase-login
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id='firebase-login-form'>
+  <!--creating&ctrling a login-form.  
+    modified version of demo-element: x-login -->
+  <style>
+    :host {
+      /*display: block;*/
+      text-align: left;
+      margin: 5px;
+      padding: 3px;
+      background-color: var(--login-background-color);
+      width: 300px;
+    }
+    .formbutton {
+      color: var(--login-button-color, red);
+      background-color: var(--login-button-background-color, cyan);
+    }
+  </style>
+
+  <template>
+
+      <firebase-auth 
+        id   = "catalogLogin" 
+        user = "{{user}}" 
+        status-known="{{_statusKnown}}" 
+        location ="{{authurl}}" 
+        provider ="{{_provider}}" 
+        on-error ="_errorHandler"> 
+        <!-- on-login ="loginHandler">  -->
+      </firebase-auth>
+
+      <!-- <div hidden$="{{computeLoginHidden(user)}}"> -->
+      <!-- div is visible only of NO user specified -->
+      <div>
+        <div>{{_message}}</div> <!--  -->
+
+      <paper-input 
+        label="email" 
+        value="{{email::input}}">
+      </paper-input>
+      <!-- <input placeholder="email" value="{{email::input}}"> -->
+      <!-- <br> -->
+
+      <paper-input 
+        value="{{password::input}}" 
+        hidden$="{{_isUser(user)}}"
+        label="password" 
+        type="password">
+      </paper-input>
+      <!-- <input placeholder="password"  value="{{password::input}}"> -->
+        <!-- <br> -->
+
+      <paper-button 
+        tabindex="0" 
+        raised 
+        on-tap="_loginStarter" 
+        hidden$="{{_isUser(user)}}"
+        class="formbutton">
+        Login
+      </paper-button>
+
+      <paper-button 
+        tabindex="0" 
+        raised 
+        on-tap="_loginReset" 
+        hidden$="{{_isNoUser(user)}}"
+        class="formbutton">
+        Reset
+      </paper-button>
+
+        <!-- <button on-tap="_loginStarter">Login</button> -->
+      <!-- <button on-tap="createUserHandler">Create user</button> -->
+    </div>
+
+  </template>
+
+  <script>
+  
+    Polymer({
+      is: 'firebase-login-form',
+
+      properties:{
+
+        /**
+         * Sets the url of the firebase-app managing the users having access to the actual app.
+         */
+        authurl: {
+          type: String,
+          value: "https://mapslide.firebaseio.com"
+        },
+          
+        /**
+         * Result of Authentification: user.
+         */
+        user: {
+          type: Object,
+          value: null,
+          observer: '_loginHandler',
+          notify: true
+        },
+
+        _provider: {
+          type: String,
+          value: 'password'
+        },
+
+        _message: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * Optional: default email value preset by  app.
+         */
+        email: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * Optional: default pwd preset by  app.
+         */
+        password: {
+          type: String,
+          value: ''
+        },
+
+        _statusKnown: {
+          type: Boolean
+        },
+
+        /**
+         * Optional: Specific action to run after successfull authentification.
+         */
+        authaction: {
+          type: Function,
+          value: null
+        }
+
+      },
+      
+      listeners: {   
+        // 'pagesId.track': 'handleTrack'
+      },
+
+      _loginHandler: function(e) { 
+        // return; 
+        if (!e) {
+          // console.log("loginHandler-null:", e);
+        } else if (e.auth) {  // if called by observer of property "user" 
+                    // ( after created by <firebase-auth>)   
+          // console.log("loginHandler-1: user-auth", e.auth);
+          if (typeof this.authaction == "Function") { 
+            console.log("starting authaction: ", this.authaction); 
+            this.authaction();
+          }
+
+        } else if (e.detail) {  // if called by "onLogin"-function of <firebase-auth>
+          console.log("loginHandler-2: detail", e.detail);
+        } else {
+          console.log("loginHandler???: e", e);
+        }
+      },
+
+      _loginStarter: function(e) {  
+        if (!e) return;   
+        if (!this.email) return;  
+        if (!this.password) {
+          this._message = "Alert. Password required"
+          return;
+        } console.log("_loginStarter by", this); 
+
+        var params = {};
+
+        if (this._provider == 'password') {
+          // params = params || {};
+          params.email  = this.email;
+          params.password = this.password;
+        }
+
+        this.$.catalogLogin.login(params);
+      },
+
+      _loginReset: function(e) {
+        this.$.catalogLogin.logout();
+        this.user = null;
+        this.email = null;
+        this.password = null;
+        this._message = "User login";
+      },
+
+      _errorHandler: function(e) { // console.log("_errorHandler", e.detail); 
+        this._message = e.detail;
+      },
+
+        _isNoUser: function(user) { // returns true if NO user specified
+        return user == null;
+        },
+
+        _isUser: function(user) { // returns true if user specified
+        if (user !== null) { 
+          var email = user.password.email; // console.log("th_isUserMail: " + email, user);
+          this.email = email;
+          this._message = "Current user";
+          return true;
+        } 
+        return false;
+        } 
+    }); 
+  </script> 
+  
+</dom-module>
+
