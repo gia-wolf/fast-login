@@ -1,6 +1,6 @@
 # firebase-login
 
-An element providing a starting point for your own reusable Polymer elements.
+A login based on email/passwd-authentification realized by specifiv firebase app (location).
 
 
 
